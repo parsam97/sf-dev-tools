@@ -34,7 +34,8 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 popup: resolve(__dirname, 'addon/src/popup.html'),
-                background: resolve(__dirname, 'addon/src/background/index.js')
+                background: resolve(__dirname, 'addon/src/background/index.js'),
+                operation: resolve(__dirname, 'addon/src/operation.html')
             },
             output: {
                 entryFileNames: '[name].js',
