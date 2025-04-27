@@ -1,0 +1,1 @@
+function s(e,a,o){if(e.message=="test")return console.log("Received message from popup"),o({reply:"Hello from background!"}),!0}function r(e){}chrome.runtime.onMessage.addListener(s);var n;(n=chrome.commands)==null||n.onCommand.addListener(r);chrome.runtime.onInstalled.addListener(({reason:e})=>{e==="install"&&console.log("Installed script run")});

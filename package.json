@@ -1,0 +1,20 @@
+{
+  "name": "sf-dev-tools",
+  "type": "module",
+  "version": "0.1",
+  "scripts": {
+    "eslint": "eslint .",
+    "dev": "vite",
+    "build": "vite build",
+    "firefox-dev-build": "node scripts/dev-build.js firefox",
+    "chrome-dev-build": "node scripts/dev-build.js chrome",
+    "firefox-release-build": "node scripts/release-build.js firefox",
+    "chrome-release-build": "node scripts/release-build.js chrome"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "eslint": "8.57.1",
+    "vite": "^6.3.3",
+    "vue": "^3.5.13"
+  }
+}
