@@ -28,6 +28,32 @@ export default {
     "https://*.force.com.mcas.ms/*",
     "https://*.builder.salesforce-experience.com/*"
   ],
+  content_scripts: [{
+    matches: [
+      "https://*.salesforce.com/*",
+      "https://*.salesforce-setup.com/*",
+      "https://*.visual.force.com/*",
+      "https://*.vf.force.com/*",
+      "https://*.lightning.force.com/*",
+      "https://*.cloudforce.com/*",
+      "https://*.visualforce.com/*",
+      "https://*.sfcrmapps.cn/*",
+      "https://*.sfcrmproducts.cn/*",
+      "https://*.salesforce.mil/*",
+      "https://*.visual.force.mil/*",
+      "https://*.vf.force.mil/*",
+      "https://*.lightning.force.mil/*",
+      "https://*.cloudforce.mil/*",
+      "https://*.visualforce.mil/*",
+      "https://*.crmforce.mil/*",
+      "https://*.lightning.force.com.mcas.ms/*",
+      "https://*.builder.salesforce-experience.com/*"
+    ],
+    all_frames: true,
+    js: [
+      "initOrgContext.js"
+    ]
+  }],
   background: {
     service_worker: "background.js",
     type: "module"
