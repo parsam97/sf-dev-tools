@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Query Builder</h1>
-    <p>Welcome to the Query Builder operation.</p>
+    <h1>Record Analysis</h1>
+    <p>Welcome to the Record Analysis operation.</p>
   </div>
 </template>
 

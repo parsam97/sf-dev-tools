@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Record Compare</h1>
-    <p>Welcome to the Record Compare operation.</p>
+    <h1>Tree-Query</h1>
+    <p>Welcome to the Tree-Query operation.</p>
   </div>
 </template>
 

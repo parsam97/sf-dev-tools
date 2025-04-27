@@ -1,8 +1,8 @@
-import { queryBuilderOperation } from "./queryBuilder";
-import { recordCompareOperation } from "./recordCompare"
+import { treeQueryOperation } from "./treeQuery";
+import { recordAnalysisOperation } from "./recordAnalysis"
 import { Operation } from "./Operation"
 
 export const operations: Operation[] = [
-    queryBuilderOperation,
-    recordCompareOperation
+    treeQueryOperation,
+    recordAnalysisOperation
 ]
