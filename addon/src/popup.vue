@@ -14,9 +14,15 @@
 import { operations } from "./operations"
 
 function openOperation(operation) {
-  const pageUrl = chrome.runtime.getURL(`operation.html?op=${operation.key}`)
-  console.log('creating tab to', pageUrl);
-  chrome.tabs.create({ url: pageUrl })
+  const operationLink = `operation.html?op=${operation.key}`
+  let pageUrl;
+  if (chrome.runtime) {
+    pageUrl = chrome.runtime.getURL(operationLink)
+    chrome.tabs.create({ url: pageUrl })
+  } else {
+    pageUrl = `${window.location.origin}/${operationLink}`;
+    window.location.href = pageUrl;
+  }
 }
 </script>
 
