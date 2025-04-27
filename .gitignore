@@ -45,5 +45,6 @@ $RECYCLE.BIN/
 **/venv/
 
 # My stuff
+addon/dist
 workingdocs.md
 .vscode/
