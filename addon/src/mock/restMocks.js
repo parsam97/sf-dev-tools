@@ -1,26 +1,35 @@
 export function getMockRestResponse(url, { method = 'GET', body } = {}) {
     const urlObj = new URL(url, 'https://mock.salesforce.com');
-    const path = urlObj.pathname;
+    const path = urlObj.pathname.replace(/\/+$/, ''); // remove any trailing slashes
     const query = Object.fromEntries(urlObj.searchParams.entries());
 
-    // Example simple matching
-    if (path.startsWith('/services/data') && path.includes('/query')) {
-        return mockQuery(query.q);
+    if (!path.startsWith('/services/data')) {
+        throw new Error(`Unknown Salesforce API path: ${path}`);
     }
 
-    if (path.startsWith('/services/data') && path.includes('/sobjects/Account')) {
-        return mockAccountObject(method, body);
-    }
+    switch (true) {
+        case path.endsWith('/query'):
+            return mockQuery(query.q);
 
-    throw new Error(`No mock implemented for ${method} ${path}`);
+        case path.endsWith('/sobjects'):
+            return mockSObjects(method, body);
+
+        case path.endsWith('/sobjects/Account'):
+            return mockAccountObject(method, body);
+
+        default:
+            throw new Error(`No mock implemented for ${method} ${path}`);
+    }
 }
 
 // Separate mock functions
 function mockQuery(soql) {
     console.log('Mocking SOQL:', soql);
+    let return_body = { totalSize: 0, done: true, records: [] }
+    let return_success = true
 
     if (soql.includes('Account')) {
-        return {
+        return_body = {
             totalSize: 2,
             done: true,
             records: [
@@ -30,7 +39,19 @@ function mockQuery(soql) {
         };
     }
 
-    return { totalSize: 0, done: true, records: [] };
+    return {
+        body: return_body,
+        success: return_success,
+    };
+}
+
+import sobjectsDescribeMock from '@mock/sobjectsDescribeMock.json';
+function mockSObjects(method, body) {
+    if (method === 'GET') {
+        return sobjectsDescribeMock;
+    }
+
+    throw new Error(`Mock for method ${method} on SObjects not implemented`);
 }
 
 function mockAccountObject(method, body) {

@@ -11,8 +11,8 @@ import { rest } from '@src/sfConn.js'
 
 onMounted(async () => {
   try {
-    const queryResult = await rest('/services/data/v60.0/query/?q=SELECT+Name+FROM+Account');
-    console.log('Accounts:', queryResult);
+    const queryResult = await rest('/services/data/v60.0/sobjects');
+    console.log('Query result:', queryResult);
   } catch (error) {
     console.error('REST API call failed:', error);
   }

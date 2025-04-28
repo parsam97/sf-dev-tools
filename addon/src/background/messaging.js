@@ -54,10 +54,38 @@ function handleGetSession(request, sender, sendResponse) {
     return true
 }
 
+function handleRestRequest(request, sender, sendResponse) {
+    fetch(request.url, {
+        method: request.method || 'GET',
+        headers: request.headers,
+        body: request.body,
+        credentials: 'include'
+    })
+        .then(async response => {
+            const contentType = response.headers.get('content-type') || '';
+            let result;
+
+            if (contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                result = await response.text();
+            }
+
+            sendResponse({ status: response.status, body: result });
+        })
+        .catch(error => {
+            console.error('Rest API call failed', error);
+            sendResponse({ error: error.message || 'Unknown error' });
+        });
+
+    return true;
+}
+
 const messageHandlers = {
     getSfHost: handleGetSfHost,
     askSfHost: handleAskSfHost,
-    getSession: handleGetSession
+    getSession: handleGetSession,
+    restRequest: handleRestRequest,
 }
 
 export function handleMessages(request, sender, sendResponse) {
