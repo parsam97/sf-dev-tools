@@ -7,6 +7,16 @@ import manifest from './addon/src/manifest.js'
 const packageJson = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)))
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            '@src': resolve(__dirname, 'addon/src'),
+            '@mock': resolve(__dirname, 'addon/src/mock'),
+            '@background': resolve(__dirname, 'addon/src/background'),
+            '@utils': resolve(__dirname, 'addon/src/utils'),
+            '@content': resolve(__dirname, 'addon/src/contentScripts'),
+            '@operations': resolve(__dirname, 'addon/src/operations'),
+        }
+    },
     plugins: [
         vue(),
         {

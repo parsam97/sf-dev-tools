@@ -6,5 +6,15 @@
 </template>
 
 <script setup lang="ts">
-// Add real logic here later
+import { onMounted } from 'vue'
+import { rest } from '@src/sfConn.js'
+
+onMounted(async () => {
+  try {
+    const queryResult = await rest('/services/data/v60.0/query/?q=SELECT+Name+FROM+Account');
+    console.log('Accounts:', queryResult);
+  } catch (error) {
+    console.error('REST API call failed:', error);
+  }
+});
 </script>
