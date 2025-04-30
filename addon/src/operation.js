@@ -1,6 +1,4 @@
 import { createApp, defineAsyncComponent } from 'vue'
-import { registerLicense } from '@syncfusion/ej2-base'
-registerLicense(import.meta.env.EJ2_LICENSE_KEY)
 
 // Extract ?op=query_builder
 const urlParams = new URLSearchParams(window.location.search)
@@ -24,5 +22,4 @@ const componentLoader = operationComponents[opKey] || (() => import('./popup.vue
 
 const OperationComponent = defineAsyncComponent(componentLoader)
 
-const app = createApp(OperationComponent)
-app.mount('#app')
+createApp(OperationComponent).mount('#app')

@@ -24,6 +24,8 @@
   import { onMounted } from 'vue'
   import { rest } from '@src/sfConn.js'
   import { QueryBuilderComponent as EjsQuerybuilder, ColumnDirective as EColumn, ColumnsDirective as EColumns } from "@syncfusion/ej2-vue-querybuilder";
+  import { registerLicense } from '@syncfusion/ej2-base'
+  registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY)
 
   const dataSource = [{
     'EmployeeID': 1,
