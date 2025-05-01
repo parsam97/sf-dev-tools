@@ -10,6 +10,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@src': resolve(__dirname, 'addon/src'),
+            '@styles': resolve(__dirname, 'addon/src/styles'),
             '@mock': resolve(__dirname, 'addon/src/mock'),
             '@background': resolve(__dirname, 'addon/src/background'),
             '@utils': resolve(__dirname, 'addon/src/utils'),

@@ -26,6 +26,8 @@
   import { QueryBuilderComponent as EjsQuerybuilder, ColumnDirective as EColumn, ColumnsDirective as EColumns } from "@syncfusion/ej2-vue-querybuilder";
   import { registerLicense } from '@syncfusion/ej2-base'
   registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY)
+  import '@styles/base.css';
+  import '@styles/initTheme.js';
 
   const dataSource = [{
     'EmployeeID': 1,
