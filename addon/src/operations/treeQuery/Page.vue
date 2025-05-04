@@ -20,9 +20,16 @@
       </div>
       <ejs-grid
         ref="sObjGridRef"
+        height=300 
+        :enableInfiniteScrolling='true'
+        :pageSettings='sObjGridOptions'
         :dataSource="qb_sObjGridDataSource"
         :created="onSobjGridCreated"
-      ></ejs-grid>
+      >
+        <e-columns>
+          <e-column field='label' headerText='Label' textAlign='Left'></e-column>
+        </e-columns>
+      </ejs-grid>
     </div>
   
     <div id="fieldSelection">
@@ -65,7 +72,7 @@
 
 <script setup lang="ts">
   // Common imports
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, provide } from 'vue'
   import { rest } from '@src/sfConn.js'
 
   // My styles
@@ -76,12 +83,14 @@
   import { DataManager, Query } from '@syncfusion/ej2-data';
   import { isNullOrUndefined } from '@syncfusion/ej2-base';
   import {
-    QueryBuilderComponent as EjsQuerybuilder,
-    ColumnDirective as EColumn,
-    ColumnsDirective as EColumns
+    QueryBuilderComponent as EjsQuerybuilder
   } from "@syncfusion/ej2-vue-querybuilder";
   import {
-    GridComponent as EjsGrid
+    GridComponent as EjsGrid,
+    ColumnsDirective as EColumns,
+    ColumnDirective as EColumn,
+    InfiniteScroll,
+    Page
   } from '@syncfusion/ej2-vue-grids'
   import {
     AccordionComponent as EjsAccordion, AccordionItemsDirective as EAccordionitems, AccordionItemDirective as EAccordionitem
@@ -89,11 +98,15 @@
   import { registerLicense } from '@syncfusion/ej2-base'
   registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY)
   
+  // sObject Grid
   const qb_sObjDataSource = ref([]);
   const qb_sObjGridDataSource = ref([]);
   const sObjQueryBuilderRef = ref(null);
   const sObjGridRef = ref(null);
+  const sObjGridOptions = { pageSize: 5 };
+  provide('grid', [Page, InfiniteScroll]);
 
+  // field Grid
   const qb_fieldDataSource = ref([]);
   const qb_fieldGridDataSource = ref([]);
   const fieldQueryBuilderRef = ref(null);
