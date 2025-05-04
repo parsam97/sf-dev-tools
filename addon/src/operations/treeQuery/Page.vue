@@ -150,20 +150,26 @@
   }
 
   function onSobjRuleChange(args) {
-    if (!qb_sObjDataSource.value.length) {
+    updateGrid(
+      qb_sObjDataSource,
+      sObjQueryBuilderRef.value.ej2Instances.getPredicate(args.rule)
+    );
+  }
+  
+  function updateGrid(dataSourceRef, predicate) {
+    if (!dataSourceRef.value.length) {
       console.warn('Data not loaded yet, skipping rule change.');
       return;
     }
     
-    const columnsToSelect = Object.keys(qb_sObjDataSource.value[0] || {});
-    const predicate = sObjQueryBuilderRef.value.ej2Instances.getPredicate(args.rule);
+    const columnsToSelect = Object.keys(dataSourceRef.value[0] || {});
     let query = new Query().select(columnsToSelect);
-
+  
     if (!isNullOrUndefined(predicate)) {
       query = query.where(predicate);
     }
-
-    new DataManager(qb_sObjDataSource.value)
+  
+    new DataManager(dataSourceRef.value)
       .executeQuery(query)
       .then((e) => {
         qb_sObjGridDataSource.value = [];
