@@ -27,7 +27,12 @@
         :created="onSobjGridCreated"
       >
         <e-columns>
-          <e-column field='label' headerText='Label' textAlign='Left'></e-column>
+          <e-column
+            v-for="column in qb_sObjGridColumns"
+            :key="column.name"
+            :field='column.name'
+            :headerText='column.label'
+            textAlign='Left'></e-column>
         </e-columns>
       </ejs-grid>
     </div>
@@ -54,7 +59,7 @@
   
     <ejs-accordion expandMode="Single">
       <e-accordionitems>
-        <e-accordionitem expanded="true" header="Step 1. Rules to define sObjects"
+        <e-accordionitem expanded="true" header="Step 1. Build rules to define the sObjects of your resulting queries"
           content="#sObjectSelection"></e-accordionitem>
         <e-accordionitem header="Step 2. Find fields for sObjects"
           content="#fieldSelection"></e-accordionitem>
@@ -72,7 +77,7 @@
 
 <script setup lang="ts">
   // Common imports
-  import { ref, onMounted, provide } from 'vue'
+  import { ref, onMounted, provide, nextTick } from 'vue'
   import { rest } from '@src/sfConn.js'
 
   // My styles
@@ -101,6 +106,7 @@
   // sObject Grid
   const qb_sObjDataSource = ref([]);
   const qb_sObjGridDataSource = ref([]);
+  const qb_sObjGridColumns = ref([]);
   const sObjQueryBuilderRef = ref(null);
   const sObjGridRef = ref(null);
   const sObjGridOptions = { pageSize: 5 };
@@ -148,15 +154,52 @@
     );
     onSobjRuleChange({ rule: validRules });
   }
-
+  
   function onSobjRuleChange(args) {
-    updateGrid(
-      qb_sObjDataSource,
-      sObjQueryBuilderRef.value.ej2Instances.getPredicate(args.rule)
-    );
+    const inst = sObjQueryBuilderRef.value.ej2Instances;
+    const predicate = inst.getPredicate(args.rule);
+
+    // 1) Extract every field used in the predicate
+    const active = new Set<string>();
+    if (predicate) {
+      if (predicate.predicates) {
+        predicate.predicates.forEach(p => active.add(p.field));
+      } else {
+        active.add(predicate.field);
+      }
+    }
+
+    // 2) Rebuild the columns list: always Label + each active field
+    qb_sObjGridColumns.value = [
+      { name: 'label', label: 'Label' },
+      ...Array.from(active).map(f => ({
+        name: f,
+        label: f
+      }))
+    ];
+
+    // 3) Refresh the grid columns so Syncfusion picks them up
+    nextTick(() => {
+      sObjGridRef.value.ej2Instances.refreshColumns();
+    });
+
+    // 4) Finally, apply the actual filter to your data
+    updateGrid(qb_sObjDataSource, predicate, sObjGridRef);
+  }
+
+  function ensureColumn(columnsRef, columnToAdd) {
+    console.log('ensuring', columnToAdd.name, columnToAdd.temp);
+    
+    if (!columnsRef.value.some(c => c.name === columnToAdd.name)) {
+      columnsRef.value.push(columnToAdd);
+    }
+  }
+
+  function capitalizeFirstLetter(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
   }
   
-  function updateGrid(dataSourceRef, predicate) {
+  function updateGrid(dataSourceRef, predicate, gridRef) {
     if (!dataSourceRef.value.length) {
       console.warn('Data not loaded yet, skipping rule change.');
       return;
@@ -174,31 +217,20 @@
       .then((e) => {
         qb_sObjGridDataSource.value = [];
         qb_sObjGridDataSource.value = e.result;
-        sObjGridRef.value.ej2Instances.refresh();
+        if (e.result.length == 0) {
+          gridRef.value.ej2Instances.dataSource = [];
+        }
+        gridRef.value.setProperties({ dataSource:  gridRef.value.ej2Instances.dataSource});
+        gridRef.value.ej2Instances.refresh();
       });
   }
 
   function onFieldRuleChange(args) {
-    if (!qb_fieldDataSource.value.length) {
-      console.warn('Data not loaded yet, skipping rule change.');
-      return;
-    }
-    
-    const columnsToSelect = Object.keys(qb_fieldDataSource.value[0] || {});
-    const predicate = fieldQueryBuilderRef.value.ej2Instances.getPredicate(args.rule);
-    let query = new Query().select(columnsToSelect);
-
-    if (!isNullOrUndefined(predicate)) {
-      query = query.where(predicate);
-    }
-
-    new DataManager(qb_fieldDataSource.value)
-      .executeQuery(query)
-      .then((e) => {
-        qb_sObjGridDataSource.value = [];
-        qb_sObjGridDataSource.value = e.result;
-        sObjGridRef.value.ej2Instances.refresh();
-      });
+    updateGrid(
+      qb_fieldDataSource,
+      fieldQueryBuilderRef.value.ej2Instances.getPredicate(args.rule),
+      fieldGridRef
+    )
   }
 </script>
 
