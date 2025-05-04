@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@syncfusion/ej2-vue-grids": "^29.1.40",
+    "@syncfusion/ej2-vue-navigations": "^29.1.40",
     "@syncfusion/ej2-vue-querybuilder": "^29.1.39"
   }
 }

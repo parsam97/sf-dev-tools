@@ -17,3 +17,24 @@ body {
   margin: 0;
   padding: 0;
 }
+
+#header {
+  padding: 1rem;
+}
+
+#header h1 {
+  margin: 0;
+}
+
+#headerContainer {
+  height: calc(10vh);
+}
+
+#contentContainer {
+  height: calc(80vh);
+  overflow-y: auto;
+}
+
+#footerContainer {
+  height: calc(10vh);
+}

@@ -1,28 +1,66 @@
 <template>
-  <div>
-    <h1>Tree-Query</h1>
-    <p>Welcome to the Tree-Query operation.</p>
-  </div>
-  <div>
-    <p>First, define the sObjects for querying</p>
-    <div class="control-section">
-      <div class="col-lg-12 querybuilder-control">
-        <ejs-querybuilder
-          width="70%"
-          :dataSource="qb_objectDataSource"
-          :ruleChange="onRuleChange"
-          ref="queryBuilderRef"
-        ></ejs-querybuilder>
-      </div>
+  <div id="headerContainer">
+    <div id="header">
+      <h1>Tree-Query</h1>
+      <p>Welcome to the Tree-Query operation. This operation lets you define rules, from which it generates valid SOQL queries.</p>
     </div>
-    <div>
+  </div>
+
+  <div id="contentContainer">
+    <div id="sObjectSelection">
+      <div class="control-section">
+        <div class="col-lg-12 querybuilder-control">
+          <ejs-querybuilder
+            width="70%"
+            :dataSource="qb_sObjDataSource"
+            :ruleChange="onSobjRuleChange"
+            ref="sObjQueryBuilderRef"
+          ></ejs-querybuilder>
+        </div>
+      </div>
       <ejs-grid
-        ref="gridRef"
-        :dataSource="qb_gridDataSource"
-        :created="onGridCreated"
+        ref="sObjGridRef"
+        :dataSource="qb_sObjGridDataSource"
+        :created="onSobjGridCreated"
       ></ejs-grid>
     </div>
+  
+    <div id="fieldSelection">
+      <div class="control-section">
+        <div class="col-lg-12 querybuilder-control">
+          <ejs-querybuilder
+            width="70%"
+            :dataSource="qb_fieldDataSource"
+            :ruleChange="onFieldRuleChange"
+            ref="fieldQueryBuilderRef"
+          ></ejs-querybuilder>
+        </div>
+      </div>
+      <div>
+        <ejs-grid
+          ref="fieldGridRef"
+          :dataSource="qb_fieldGridDataSource"
+          :created="onFieldGridCreated"
+        ></ejs-grid>
+      </div>
+    </div>
+  
+    <ejs-accordion expandMode="Single">
+      <e-accordionitems>
+        <e-accordionitem expanded="true" header="Step 1. Rules to define sObjects"
+          content="#sObjectSelection"></e-accordionitem>
+        <e-accordionitem header="Step 2. Find fields for sObjects"
+          content="#fieldSelection"></e-accordionitem>
+        <e-accordionitem header="Result"
+          content="JavaScript (JS) is an interpreted computer programming language.It was originally implemented as part of web browsers so that client-side scripts could interact with the user, control the browser, communicate asynchronously, and alter the document content that was displayed."></e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
   </div>
+
+  <div id="footerContainer">
+    id box
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -45,17 +83,25 @@
   import {
     GridComponent as EjsGrid
   } from '@syncfusion/ej2-vue-grids'
+  import {
+    AccordionComponent as EjsAccordion, AccordionItemsDirective as EAccordionitems, AccordionItemDirective as EAccordionitem
+  } from "@syncfusion/ej2-vue-navigations";
   import { registerLicense } from '@syncfusion/ej2-base'
   registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY)
   
-  const qb_objectDataSource = ref([]);
-  const qb_gridDataSource = ref([]);
-  const queryBuilderRef = ref(null);
-  const gridRef = ref(null);
+  const qb_sObjDataSource = ref([]);
+  const qb_sObjGridDataSource = ref([]);
+  const sObjQueryBuilderRef = ref(null);
+  const sObjGridRef = ref(null);
+
+  const qb_fieldDataSource = ref([]);
+  const qb_fieldGridDataSource = ref([]);
+  const fieldQueryBuilderRef = ref(null);
+  const fieldGridRef = ref(null);
 
   onMounted(async () => {
     const queryResult = await rest('/services/data/v60.0/sobjects');
-    qb_objectDataSource.value = queryResult.sobjects.map(obj => {
+    qb_sObjDataSource.value = queryResult.sobjects.map(obj => {
       const flatObj = {};
       for (let [key, value] of Object.entries(obj)) {
         if (value !== null && typeof value === 'object') { continue; } 
@@ -65,42 +111,74 @@
       }
       return flatObj;
     });
-    onRuleChange({ rule: queryBuilderRef.value?.ej2Instances?.rule || {} });
+    onSobjRuleChange({ rule: sObjQueryBuilderRef.value?.ej2Instances?.rule || {} });
   });
 
-  function onGridCreated() {
-    if (!queryBuilderRef.value?.ej2Instances) {
-      console.warn('QueryBuilder ref is not ready yet.');
+  function onSobjGridCreated() {
+    if (!sObjQueryBuilderRef.value?.ej2Instances) {
+      console.warn('sObject QueryBuilder ref is not ready yet.');
       return;
     }
-    const validRules = queryBuilderRef.value.ej2Instances.getValidRules(
-      queryBuilderRef.value.ej2Instances.rule
+    const validRules = sObjQueryBuilderRef.value.ej2Instances.getValidRules(
+      sObjQueryBuilderRef.value.ej2Instances.rule
     );
-    onRuleChange({ rule: validRules });
+    onSobjRuleChange({ rule: validRules });
   }
 
-  function onRuleChange(args) {
-    if (!qb_objectDataSource.value.length) {
+  function onFieldGridCreated() {
+    if (!fieldQueryBuilderRef.value?.ej2Instances) {
+      console.warn('Field QueryBuilder ref is not ready yet.');
+      return;
+    }
+    const validRules = fieldQueryBuilderRef.value.ej2Instances.getValidRules(
+      fieldQueryBuilderRef.value.ej2Instances.rule
+    );
+    onSobjRuleChange({ rule: validRules });
+  }
+
+  function onSobjRuleChange(args) {
+    if (!qb_sObjDataSource.value.length) {
       console.warn('Data not loaded yet, skipping rule change.');
       return;
     }
     
-    const columnsToSelect = Object.keys(qb_objectDataSource.value[0] || {});
-    const predicate = queryBuilderRef.value.ej2Instances.getPredicate(args.rule);
+    const columnsToSelect = Object.keys(qb_sObjDataSource.value[0] || {});
+    const predicate = sObjQueryBuilderRef.value.ej2Instances.getPredicate(args.rule);
     let query = new Query().select(columnsToSelect);
 
     if (!isNullOrUndefined(predicate)) {
       query = query.where(predicate);
     }
 
-    new DataManager(qb_objectDataSource.value)
+    new DataManager(qb_sObjDataSource.value)
       .executeQuery(query)
       .then((e) => {
-        qb_gridDataSource.value = [];
-        qb_gridDataSource.value = e.result;
-        gridRef.value.ej2Instances.refresh();
-        console.log('Set to', e.result);
-        
+        qb_sObjGridDataSource.value = [];
+        qb_sObjGridDataSource.value = e.result;
+        sObjGridRef.value.ej2Instances.refresh();
+      });
+  }
+
+  function onFieldRuleChange(args) {
+    if (!qb_fieldDataSource.value.length) {
+      console.warn('Data not loaded yet, skipping rule change.');
+      return;
+    }
+    
+    const columnsToSelect = Object.keys(qb_fieldDataSource.value[0] || {});
+    const predicate = fieldQueryBuilderRef.value.ej2Instances.getPredicate(args.rule);
+    let query = new Query().select(columnsToSelect);
+
+    if (!isNullOrUndefined(predicate)) {
+      query = query.where(predicate);
+    }
+
+    new DataManager(qb_fieldDataSource.value)
+      .executeQuery(query)
+      .then((e) => {
+        qb_sObjGridDataSource.value = [];
+        qb_sObjGridDataSource.value = e.result;
+        sObjGridRef.value.ej2Instances.refresh();
       });
   }
 </script>
@@ -117,4 +195,5 @@
 @import "@syncfusion/ej2-vue-querybuilder/styles/material.css";
 @import "@syncfusion/ej2-navigations/styles/material.css";
 @import "@syncfusion/ej2-vue-grids/styles/material.css";
+@import "@syncfusion/ej2-vue-navigations/styles/material.css";
 </style>
